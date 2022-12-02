@@ -10,12 +10,10 @@
 
 	export let data: { posts: [any] };
 
-	const getImages = async (post: any) => {
-		return Promise.all([
-			import('./../../content/blog/' + `${post.slug}/${post.image}?url`),
-			autorsImagesFiles[post.author] || autorsImagesFiles['unknown']
-		]).then(([postImageFile, authorImageFile]) => [postImageFile.default, authorImageFile.default]);
-	};
+	const getImages = async (post: any) =>
+		(autorsImagesFiles[post.author] || autorsImagesFiles['unknown']).then(
+			(authorImageFile) => authorImageFile.default
+		);
 </script>
 
 <div class="bg-nuv-blue w-full h-[111px]" />
@@ -29,16 +27,13 @@
 	<div class="mt-[67px] px-[98px]">
 		<div class="flex flex-wrap">
 			{#each data.posts as post}
-				{#await getImages(post)}
-					<h1>Loading posts</h1>
-				{:then [mainImage, authorImage]}
+				{#await getImages(post) then authorImage}
 					<PostCard
 						slug={post.slug}
 						title={post.title}
 						date={post.date}
 						authorName={post.author}
 						{authorImage}
-						{mainImage}
 						topic={post.topic}
 						summary={post.summary}
 					/>
